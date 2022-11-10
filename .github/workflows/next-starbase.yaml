@@ -1,13 +1,14 @@
-# .github/workflows/main-starbase.yaml
+# .github/workflows/next-starbase.yaml
 ---
-name: Starbase
+name: Next Starbase
 
 on:
   push:
+    # TODO remove "branches" once workflow is functional
     branches:
-      - main
-      # TODO remove this once workflow is functional
       - chore/sb-gha
+    tags:
+      - '*'
 
 defaults:
   run:
@@ -26,18 +27,18 @@ jobs:
       - run: nix-build platform.nix
 
       - name: Install
-        run: yarn workspaces focus -A
+        run: yarn workspaces focus --all
 
       - name: Test
         run: yarn workspaces foreach -i -v -t --include starbase run test
 
-      - name: Deploy Starbase to Dev Worker
+      - name: Deploy Starbase to Next Worker
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: "platform/starbase"
-          command: publish --env dev
-          environment: "dev"
+          command: publish --env next
+          environment: "next"
           secrets:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
